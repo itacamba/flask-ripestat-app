@@ -2,22 +2,24 @@ from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 import requests
 import pprint
+from validate_object import validate
+from get_obj_data import get_data_for
 
 
 app = Flask(__name__)
 
-# @app.route('/')
-# def index():
-#     r = requests.get('https://stat.ripe.net/data/whois/data.json?resource=185.83.156.0')
-#     data = r.json()['data']['records'][0]
-#     return render_template('ripe_object.html', data=data)
+
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
     if request.method == 'POST':
         obj = request.form['ripe_object']
-        if re.match(r'^((25[0-5]|(2[0-4]|1[0-9]|[1-9]|)[0-9])(\.(?!$)|$)){4}$', obj):
-            return redirect(url_for('ripe_object', obj=obj))
+        if validate(obj) == "inetnum":
+            data = get_data_for(obj, "inetnum")
+            return render_template('ripe_object.html', title="Inetnum", data=data, obj_type="inetnum")
+        elif validate(obj) == "organisation":
+            obj = get_data_for(obj)
+            return render_template('ripe_object.html', title="Organisation", obj=obj, obj_type="organisation")
         else:
             return "no match"
     else:
