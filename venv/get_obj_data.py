@@ -11,3 +11,9 @@ def get_data_for(obj, obj_type):
     # elif obj_type == "organisation":
 
         # return render_template('ripe_object.html', data=data)
+
+def who_is_data(obj, obj_type):
+    if obj_type == "inetnum":
+        response = requests.get(f'http://rest.db.ripe.net/ripe/{obj_type}/{obj}.json')
+        data = response.json()['objects']
+        print(data)
